@@ -301,6 +301,37 @@ MonoBehaviour:
     m_Bits: 4294967295
   hitForce: 10
   hitDirection: {x: 0, y: 0, z: 1}
+--- !u!1 &692492228
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 692492229}
+  m_Layer: 0
+  m_Name: ARGameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &692492229
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 692492228}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &787880791
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +345,7 @@ GameObject:
   - component: {fileID: 787880794}
   - component: {fileID: 787880793}
   - component: {fileID: 787880792}
+  - component: {fileID: 787880798}
   - component: {fileID: 787880797}
   m_Layer: 0
   m_Name: XR Origin (AR Rig)
@@ -409,13 +441,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 787880791}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 309c617f531fe44b3a257aa71bb2c1ee, type: 3}
+  m_Script: {fileID: 11500000, guid: 1bf71e88edc6c486595e8a58f51f9a36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  petPrefab: {fileID: 0}
+  petOffset: {x: 0, y: 0, z: 0}
+  lookAtCamera: 1
+  autoPlace: 0
+  autoPlaceDelay: 2
+--- !u!114 &787880798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787880791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e5147a27c1d3495a8e427000bd4beb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   planeManager: {fileID: 0}
   raycastManager: {fileID: 0}
-  petPrefab: {fileID: 0}
+  arCamera: {fileID: 0}
   minPlaneSize: 0.5
+  maxPlaneAngle: 15
   placementIndicator: {fileID: 0}
 --- !u!1 &927362293
 GameObject:
@@ -1172,3 +1222,4 @@ SceneRoots:
   - {fileID: 504795102}
   - {fileID: 1026004694}
   - {fileID: 1015999936}
+  - {fileID: 692492229}

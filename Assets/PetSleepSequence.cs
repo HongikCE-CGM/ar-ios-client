@@ -6,6 +6,7 @@ public class PetSleepSequence : MonoBehaviour
     private Vector2 touchStartPos;
     private bool isTouchingPet = false;
     private Animator animator;
+    public SleepUIButtonCreator sleepUIButtonCreator;
 
     void Start()
     {
@@ -14,6 +15,8 @@ public class PetSleepSequence : MonoBehaviour
 
     void Update()
     {
+        if (sleepUIButtonCreator != null && !sleepUIButtonCreator.IsSleepOn())
+            return;
         if (Input.touchCount == 0) return;
 
         Touch touch = Input.GetTouch(0);

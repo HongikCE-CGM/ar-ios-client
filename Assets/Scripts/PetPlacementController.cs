@@ -128,8 +128,27 @@ public class PetPlacementController : MonoBehaviour
     {
         foreach (ARPlane plane in args.added)
         {
-            // Example: Enable the visual component of the plane prefab if it's disabled by default
-            // plane.gameObject.GetComponentInChildren<MeshRenderer>(true)?.enabled = true;
+            plane.gameObject.SetActive(true);
+            EnablePlaneVisuals(plane);
+        }
+        foreach (ARPlane plane in args.updated)
+        {
+            EnablePlaneVisuals(plane);
+        }
+    }
+
+    void EnablePlaneVisuals(ARPlane plane)
+    {
+        MeshRenderer meshRenderer = plane.GetComponentInChildren<MeshRenderer>();
+        if (meshRenderer != null)
+        {
+            meshRenderer.enabled = true;
+        }
+
+        LineRenderer lineRenderer = plane.GetComponentInChildren<LineRenderer>();
+        if (lineRenderer != null)
+        {
+            lineRenderer.enabled = true;
         }
     }
 

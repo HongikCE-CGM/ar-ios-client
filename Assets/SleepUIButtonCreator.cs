@@ -1,34 +1,33 @@
+// Assets/SleepUIButtonCreator.cs
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class SleepUIButtonCreator : MonoBehaviour
 {
-    [Header("Optional: Assign existing Canvas, or leave empty to auto-create")]
+    [Header("Optional: Assign existing Canvas or leave empty")]
     public Canvas canvas;
 
-    private bool sleepOn = false;
-    private Image toggleButtonImage;
+    bool sleepOn = false;
+    Image toggleButtonImage;
 
     void Start()
     {
-        // 1) Canvas 생성 및 설정
         if (canvas == null)
         {
-            var canvasGO = new GameObject("Canvas");
-            canvas = canvasGO.AddComponent<Canvas>();
+            var cgo = new GameObject("Canvas");
+            canvas = cgo.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasGO.AddComponent<CanvasScaler>();
-            canvasGO.AddComponent<GraphicRaycaster>();
+            cgo.AddComponent<CanvasScaler>();
+            cgo.AddComponent<GraphicRaycaster>();
             if (FindObjectOfType<EventSystem>() == null)
             {
-                var esGO = new GameObject("EventSystem");
-                esGO.AddComponent<EventSystem>();
-                esGO.AddComponent<StandaloneInputModule>();
+                var es = new GameObject("EventSystem");
+                es.AddComponent<EventSystem>();
+                es.AddComponent<StandaloneInputModule>();
             }
         }
 
-        // 2) Sleep 토글 버튼 생성
         var btnGO = new GameObject("SleepToggleButton");
         btnGO.transform.SetParent(canvas.transform, false);
 
@@ -37,42 +36,51 @@ public class SleepUIButtonCreator : MonoBehaviour
         rt.anchorMin = new Vector2(1, 0);
         rt.anchorMax = new Vector2(1, 0);
         rt.pivot = new Vector2(1, 0);
-        // Feed(-10,10), Ball(-10,220), Sleep → 위로 200+10 더
+        // Ball(-10,220) 위에 배치: 10 + 200 + 10 + 200 + 10 = 430
         rt.anchoredPosition = new Vector2(-10, 430);
 
         toggleButtonImage = btnGO.AddComponent<Image>();
-        toggleButtonImage.color = new Color(1f, 1f, 1f, 0.5f); // 초기 Off
+        toggleButtonImage.color = new Color(1f, 1f, 1f, 0.5f);
 
-        var button = btnGO.AddComponent<Button>();
-        button.targetGraphic = toggleButtonImage;
-        button.onClick.AddListener(OnToggleSleep);
+        var btn = btnGO.AddComponent<Button>();
+        btn.targetGraphic = toggleButtonImage;
+        btn.onClick.AddListener(OnToggleSleep);
 
-        // 버튼 텍스트
         var txtGO = new GameObject("Text");
         txtGO.transform.SetParent(btnGO.transform, false);
         var txtRT = txtGO.AddComponent<RectTransform>();
         txtRT.anchorMin = Vector2.zero;
         txtRT.anchorMax = Vector2.one;
-        txtRT.offsetMin = Vector2.zero;
-        txtRT.offsetMax = Vector2.zero;
+        txtRT.offsetMin = txtRT.offsetMax = Vector2.zero;
         var txt = txtGO.AddComponent<Text>();
-        txt.text = "Sleep";
+        txt.text = "쓰다듬기";
         txt.alignment = TextAnchor.MiddleCenter;
         txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         txt.fontSize = 30;
         txt.color = Color.black;
     }
 
-    private void OnToggleSleep()
+    void OnToggleSleep()
     {
         sleepOn = !sleepOn;
-        toggleButtonImage.color = sleepOn 
-            ? new Color(1f, 1f, 1f, 1f)   // On
-            : new Color(1f, 1f, 1f, 0.5f);;
+        toggleButtonImage.color = sleepOn ? new Color(1f,1f,1f,1f)
+            : new Color(1f,1f,1f,0.5f);
+
+        if (sleepOn)
+        {
+            foreach (var f in FindObjectsOfType<FeedUIButtonCreator>())
+                f.SetFeedOn(false);
+            foreach (var b in FindObjectsOfType<BallUIButtonCreator>())
+                b.SetBallOn(false);
+        }
     }
 
-    /// <summary>
-    /// 외부에서 현재 Sleep 토글 상태를 확인할 때
-    /// </summary>
     public bool IsSleepOn() => sleepOn;
+
+    public void SetSleepOn(bool value)
+    {
+        sleepOn = value;
+        toggleButtonImage.color = sleepOn ?  new Color(1f,1f,1f,1f)
+            : new Color(1f,1f,1f,0.5f);
+    }
 }

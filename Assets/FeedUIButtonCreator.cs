@@ -1,85 +1,92 @@
+// Assets/FeedUIButtonCreator.cs
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class FeedUIButtonCreator : MonoBehaviour
 {
-    // 이미 씬에 Canvas가 있으면 할당, 없으면 Start()에서 생성
+    [Header("Optional: Assign existing Canvas or leave empty")]
     public Canvas canvas;
 
-    private bool feedOn = false;
-    private Image toggleButtonImage;
+    bool feedOn = false;
+    Image toggleButtonImage;
 
     void Start()
     {
-        // Canvas 생성 및 설정
+        // Canvas 생성/확인
         if (canvas == null)
         {
-            var canvasGO = new GameObject("Canvas");
-            canvas = canvasGO.AddComponent<Canvas>();
+            var cgo = new GameObject("Canvas");
+            canvas = cgo.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasGO.AddComponent<CanvasScaler>();
-            canvasGO.AddComponent<GraphicRaycaster>();
-
-            // EventSystem이 없으면 생성
+            cgo.AddComponent<CanvasScaler>();
+            cgo.AddComponent<GraphicRaycaster>();
             if (FindObjectOfType<EventSystem>() == null)
             {
-                var esGO = new GameObject("EventSystem");
-                esGO.AddComponent<EventSystem>();
-                esGO.AddComponent<StandaloneInputModule>();
+                var es = new GameObject("EventSystem");
+                es.AddComponent<EventSystem>();
+                es.AddComponent<StandaloneInputModule>();
             }
         }
 
         // 버튼 생성
-        var buttonGO = new GameObject("FeedToggleButton");
-        buttonGO.transform.SetParent(canvas.transform, false);
+        var btnGO = new GameObject("FeedToggleButton");
+        btnGO.transform.SetParent(canvas.transform, false);
 
-        // RectTransform 설정 (300×200, 우측 하단)
-        var rt = buttonGO.AddComponent<RectTransform>();
+        var rt = btnGO.AddComponent<RectTransform>();
         rt.sizeDelta = new Vector2(300, 200);
         rt.anchorMin = new Vector2(1, 0);
         rt.anchorMax = new Vector2(1, 0);
         rt.pivot = new Vector2(1, 0);
         rt.anchoredPosition = new Vector2(-10, 10);
 
+        // 이미지 & 초기 색상
+        toggleButtonImage = btnGO.AddComponent<Image>();
+        toggleButtonImage.color = new Color(1f, 1f, 1f, 0.5f);
 
-    toggleButtonImage = buttonGO.AddComponent<Image>();
-    toggleButtonImage.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
-    toggleButtonImage.type = Image.Type.Simple;
-    toggleButtonImage.preserveAspect = false;
-    toggleButtonImage.color = new Color(1f, 1f, 1f, 0.5f); // Off 상태: 반투명
+        var btn = btnGO.AddComponent<Button>();
+        btn.targetGraphic = toggleButtonImage;
+        btn.onClick.AddListener(OnToggleFeed);
 
-        // 버튼 컴포넌트 & 클릭 리스너
-        var button = buttonGO.AddComponent<Button>();
-        button.targetGraphic = toggleButtonImage;
-        button.onClick.AddListener(OnToggleFeed);
-
-        // 버튼 텍스트
-        var textGO = new GameObject("Text");
-        textGO.transform.SetParent(buttonGO.transform, false);
-        var textRT = textGO.AddComponent<RectTransform>();
-        textRT.anchorMin = Vector2.zero;
-        textRT.anchorMax = Vector2.one;
-        textRT.offsetMin = Vector2.zero;
-        textRT.offsetMax = Vector2.zero;
-
-        var text = textGO.AddComponent<Text>();
-        text.text = "먹이주기";
-        text.alignment = TextAnchor.MiddleCenter;
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        text.fontSize = 30;
-        text.color = Color.black;
+        // 텍스트
+        var txtGO = new GameObject("Text");
+        txtGO.transform.SetParent(btnGO.transform, false);
+        var txtRT = txtGO.AddComponent<RectTransform>();
+        txtRT.anchorMin = Vector2.zero;
+        txtRT.anchorMax = Vector2.one;
+        txtRT.offsetMin = txtRT.offsetMax = Vector2.zero;
+        var txt = txtGO.AddComponent<Text>();
+        txt.text = "먹이주기";
+        txt.alignment = TextAnchor.MiddleCenter;
+        txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        txt.fontSize = 30;
+        txt.color = Color.black;
     }
 
-    private void OnToggleFeed()
+    void OnToggleFeed()
     {
         feedOn = !feedOn;
-        // On 상태: 완전 불투명, Off 상태: 반투명
-        toggleButtonImage.color = feedOn 
-            ? new Color(1f, 1f, 1f, 1f)   // On
-            : new Color(1f, 1f, 1f, 0.5f); // Off
+        toggleButtonImage.color = feedOn
+            ? new Color(1f,1f,1f,1f)
+            : new Color(1f,1f,1f,0.5f);
+
+        if (feedOn)
+        {
+            // 다른 버튼 꺼주기
+            foreach (var b in FindObjectsOfType<BallUIButtonCreator>())
+                b.SetBallOn(false);
+            foreach (var s in FindObjectsOfType<SleepUIButtonCreator>())
+                s.SetSleepOn(false);
+        }
     }
 
-    // FeedSpawner에서 상태 확인용
     public bool IsFeedOn() => feedOn;
+
+    public void SetFeedOn(bool value)
+    {
+        feedOn = value;
+        toggleButtonImage.color = feedOn
+            ? new Color(1f,1f,1f,1f)
+            : new Color(1f,1f,1f,0.5f);
+    }
 }

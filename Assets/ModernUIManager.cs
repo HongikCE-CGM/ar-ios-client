@@ -34,11 +34,11 @@ public class ModernUIManager : MonoBehaviour
         backgroundPanel.transform.SetParent(canvas.transform, false);
         
         var bgRT = backgroundPanel.AddComponent<RectTransform>();
-        bgRT.sizeDelta = new Vector2(680, 220); // 훨씬 더 큰 배경 패널
+        bgRT.sizeDelta = new Vector2(800, 260); // 더욱 더 큰 배경 패널
         bgRT.anchorMin = new Vector2(0.5f, 0f);
         bgRT.anchorMax = new Vector2(0.5f, 0f);
         bgRT.pivot = new Vector2(0.5f, 0f);
-        bgRT.anchoredPosition = new Vector2(0, 160); // 새로운 버튼 위치에 맞춤
+        bgRT.anchoredPosition = new Vector2(0, 220); // 새로운 버튼 위치에 맞춤
         
         // 반투명 둥근 배경
         var bgImage = backgroundPanel.AddComponent<Image>();
@@ -65,12 +65,12 @@ public class ModernUIManager : MonoBehaviour
     
     Sprite CreateRoundedRectSprite()
     {
-        var texture = new Texture2D(340, 110); // 훨씬 더 큰 텍스처
-        var cornerRadius = 50f;
+        var texture = new Texture2D(400, 130); // 더욱 더 큰 텍스처
+        var cornerRadius = 60f;
         
-        for (int x = 0; x < 340; x++)
+        for (int x = 0; x < 400; x++)
         {
-            for (int y = 0; y < 110; y++)
+            for (int y = 0; y < 130; y++)
             {
                 float alpha = 1f;
                 
@@ -79,15 +79,15 @@ public class ModernUIManager : MonoBehaviour
                 {
                     var distX = Mathf.Max(0, cornerRadius - x);
                     var distY = y < cornerRadius ? Mathf.Max(0, cornerRadius - y) : 
-                               y > (110 - cornerRadius) ? Mathf.Max(0, y - (110 - cornerRadius)) : 0;
+                               y > (130 - cornerRadius) ? Mathf.Max(0, y - (130 - cornerRadius)) : 0;
                     var dist = Mathf.Sqrt(distX * distX + distY * distY);
                     alpha = dist <= cornerRadius ? 1f : 0f;
                 }
-                else if (x > (340 - cornerRadius)) // 오른쪽 모서리
+                else if (x > (400 - cornerRadius)) // 오른쪽 모서리
                 {
-                    var distX = Mathf.Max(0, x - (340 - cornerRadius));
+                    var distX = Mathf.Max(0, x - (400 - cornerRadius));
                     var distY = y < cornerRadius ? Mathf.Max(0, cornerRadius - y) : 
-                               y > (110 - cornerRadius) ? Mathf.Max(0, y - (110 - cornerRadius)) : 0;
+                               y > (130 - cornerRadius) ? Mathf.Max(0, y - (130 - cornerRadius)) : 0;
                     var dist = Mathf.Sqrt(distX * distX + distY * distY);
                     alpha = dist <= cornerRadius ? 1f : 0f;
                 }
@@ -97,24 +97,24 @@ public class ModernUIManager : MonoBehaviour
         }
         texture.Apply();
         
-        return Sprite.Create(texture, new Rect(0, 0, 340, 110), new Vector2(0.5f, 0.5f));
+        return Sprite.Create(texture, new Rect(0, 0, 400, 130), new Vector2(0.5f, 0.5f));
     }
     
     Sprite CreateGradientSprite()
     {
-        var texture = new Texture2D(340, 110); // 훨씬 더 큰 텍스처
+        var texture = new Texture2D(400, 130); // 더욱 더 큰 텍스처
         
-        for (int x = 0; x < 340; x++)
+        for (int x = 0; x < 400; x++)
         {
-            for (int y = 0; y < 110; y++)
+            for (int y = 0; y < 130; y++)
             {
-                float gradientValue = (float)y / 110f; // 위에서 아래로 그라데이션
+                float gradientValue = (float)y / 130f; // 위에서 아래로 그라데이션
                 float alpha = Mathf.Lerp(0.3f, 0f, gradientValue);
                 texture.SetPixel(x, y, new Color(1, 1, 1, alpha));
             }
         }
         texture.Apply();
         
-        return Sprite.Create(texture, new Rect(0, 0, 340, 110), new Vector2(0.5f, 0.5f));
+        return Sprite.Create(texture, new Rect(0, 0, 400, 130), new Vector2(0.5f, 0.5f));
     }
 } 

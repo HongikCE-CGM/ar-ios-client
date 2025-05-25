@@ -40,12 +40,12 @@ public class FeedUIButtonCreator : MonoBehaviour
         btnGO.transform.SetParent(canvas.transform, false);
 
         var rt = btnGO.AddComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(200, 200); // 훨씬 더 큰 정사각형 모던 버튼
+        rt.sizeDelta = new Vector2(240, 240); // 더욱 더 큰 정사각형 모던 버튼
         rt.anchorMin = new Vector2(0.5f, 0f);
         rt.anchorMax = new Vector2(0.5f, 0f);
         rt.pivot = new Vector2(0.5f, 0f);
-        // 하단 중앙, 중간 버튼 위치 (훨씬 더 위로)
-        rt.anchoredPosition = new Vector2(0, 180);
+        // 하단 중앙, 중간 버튼 위치 (더욱 더 위로)
+        rt.anchoredPosition = new Vector2(0, 240);
 
         // 모던한 둥근 버튼 배경
         toggleButtonImage = btnGO.AddComponent<Image>();
@@ -82,7 +82,7 @@ public class FeedUIButtonCreator : MonoBehaviour
         var txtGO = new GameObject("Text");
         txtGO.transform.SetParent(contentGO.transform, false);
         var txtRT = txtGO.AddComponent<RectTransform>();
-        txtRT.sizeDelta = new Vector2(180, 40);
+        txtRT.sizeDelta = new Vector2(220, 50);
         txtRT.anchorMin = new Vector2(0.5f, 0.5f);
         txtRT.anchorMax = new Vector2(0.5f, 0.5f);
         txtRT.anchoredPosition = new Vector2(0, 0); // 완전한 정중앙!!!
@@ -90,7 +90,7 @@ public class FeedUIButtonCreator : MonoBehaviour
         buttonText.text = "🍖 먹이주기";
         buttonText.alignment = TextAnchor.MiddleCenter;
         buttonText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        buttonText.fontSize = 20; // 더 큰 텍스트
+        buttonText.fontSize = 24; // 훨씬 더 큰 텍스트
         buttonText.fontStyle = FontStyle.Bold;
         buttonText.color = Color.white;
 

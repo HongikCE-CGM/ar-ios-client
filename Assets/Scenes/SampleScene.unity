@@ -323,6 +323,9 @@ MonoBehaviour:
   closeFollowDistance: 2
   frontBoostMultiplier: 1.5
   followSmoothTime: 0.6
+  closeFollowDistance: 2
+  frontBoostMultiplier: 1.5
+  followSmoothTime: 0.5
   feederController: {fileID: 645435324}
 --- !u!4 &645435323 stripped
 Transform:
@@ -871,6 +874,7 @@ MonoBehaviour:
   petFeederController: {fileID: 645435324}
   tapTimeThreshold: 0.3
   tapDistanceThreshold: 30
+  feedUIButtonCreator: {fileID: 1828601336}
 --- !u!4 &1499897483
 Transform:
   m_ObjectHideFlags: 0

@@ -4,7 +4,6 @@ using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using UnityEngine.EventSystems;
 using System.Collections;
-using System.Collections;
 using System.Collections.Generic;
 
 public class FeedSpawner : MonoBehaviour
@@ -72,7 +71,6 @@ public class FeedSpawner : MonoBehaviour
         {
             float t = Mathf.SmoothStep(0, 1, elapsed / flightDuration);
             Vector3 midPoint = Vector3.Lerp(startPos, targetPos, t);
-            midPoint.y += Mathf.Sin(t * Mathf.PI) * 0.5f;
             midPoint.y += Mathf.Sin(t * Mathf.PI) * 0.5f;
             obj.position = midPoint;
             elapsed += Time.deltaTime;

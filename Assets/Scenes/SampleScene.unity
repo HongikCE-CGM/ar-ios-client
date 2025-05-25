@@ -320,6 +320,26 @@ MonoBehaviour:
   stopThreshold: 0.1
   followDistance: 7.5
   yOffset: 0
+  feederController: {fileID: 645435324}
+--- !u!4 &645435323 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
+  m_PrefabInstance: {fileID: 2065508197}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &645435324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 645435320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd0e1f675ad04709b58a88cff7d8827, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 1.5
+  stopDistance: 0.2
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -750,6 +770,56 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!1 &1499897481
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1499897483}
+  - component: {fileID: 1499897482}
+  m_Layer: 0
+  m_Name: FeedSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1499897482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1499897481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 527419a55b7c54dcfbc428f65db98251, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hamburgerPrefab: {fileID: 1000011448446114, guid: 8155176e03f33f44884efb0dd767197c, type: 3}
+  petTransform: {fileID: 645435323}
+  dropRadius: 1
+  flightDuration: 1.2
+  arRaycastManager: {fileID: 586014098}
+  petFeederController: {fileID: 645435324}
+--- !u!4 &1499897483
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1499897481}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.50752, y: 0, z: -3.79255}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1997398998
 GameObject:
   m_ObjectHideFlags: 0
@@ -834,6 +904,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ArcticFox_LOD0
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
+      propertyPath: m_TagString
+      value: Pet
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -844,6 +918,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 645435321}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 645435324}
   m_SourcePrefab: {fileID: 100100000, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -855,3 +932,4 @@ SceneRoots:
   - {fileID: 782628377}
   - {fileID: 223974228}
   - {fileID: 2065508197}
+  - {fileID: 1499897483}

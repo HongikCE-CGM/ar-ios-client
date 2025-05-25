@@ -40,10 +40,10 @@ namespace ARPetGame
         private void SetupComponents()
         {
             if (planeDetector == null)
-                planeDetector = FindObjectOfType<ImprovedARPlaneDetector>();
+                planeDetector = FindFirstObjectByType<ImprovedARPlaneDetector>();
                 
             if (petPlacer == null)
-                petPlacer = FindObjectOfType<PetPlacer>();
+                petPlacer = FindFirstObjectByType<PetPlacer>();
             
             if (planeDetector != null)
             {

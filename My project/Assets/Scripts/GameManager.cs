@@ -41,13 +41,13 @@ namespace ARPetGame
         private void SetupComponents()
         {
             if (arGameManager == null)
-                arGameManager = FindObjectOfType<ARGameManager>();
+                arGameManager = FindFirstObjectByType<ARGameManager>();
                 
             if (scoreManager == null)
-                scoreManager = FindObjectOfType<ScoreManager>();
+                scoreManager = FindFirstObjectByType<ScoreManager>();
                 
             if (ballController == null)
-                ballController = FindObjectOfType<BallController>();
+                ballController = FindFirstObjectByType<BallController>();
                 
             arCamera = Camera.main;
         }
@@ -181,6 +181,21 @@ namespace ARPetGame
             {
                 SpawnNewBall();
             }
+        }
+        
+        public bool IsGameActive()
+        {
+            return isGameActive;
+        }
+        
+        public int GetMissedBalls()
+        {
+            return missedBalls;
+        }
+        
+        public int GetRemainingLives()
+        {
+            return Mathf.Max(0, maxMissedBalls - missedBalls);
         }
     }
 }

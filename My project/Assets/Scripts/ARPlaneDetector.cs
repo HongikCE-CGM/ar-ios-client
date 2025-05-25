@@ -27,10 +27,10 @@ namespace ARPetGame
             arCamera = Camera.main;
             
             if (planeManager == null)
-                planeManager = FindObjectOfType<ARPlaneManager>();
+                planeManager = FindFirstObjectByType<ARPlaneManager>();
                 
             if (raycastManager == null)
-                raycastManager = FindObjectOfType<ARRaycastManager>();
+                raycastManager = FindFirstObjectByType<ARRaycastManager>();
         }
         
         private void Start()

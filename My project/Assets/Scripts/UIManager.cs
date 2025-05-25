@@ -27,7 +27,7 @@ namespace ARPetGame
         
         private void Start()
         {
-            gameManager = FindObjectOfType<ARGameManager>();
+            gameManager = FindFirstObjectByType<ARGameManager>();
             
             if (gameManager != null)
             {
@@ -114,6 +114,22 @@ namespace ARPetGame
             currentScore = score;
             if (scoreText != null)
                 scoreText.text = $"Score: {score}";
+        }
+        
+        public void AddScore(int points = 1)
+        {
+            currentScore += points;
+            UpdateScore(currentScore);
+        }
+        
+        public int GetCurrentScore()
+        {
+            return currentScore;
+        }
+        
+        public void ResetScore()
+        {
+            UpdateScore(0);
         }
         
         private void SetDimOverlay(bool enabled)

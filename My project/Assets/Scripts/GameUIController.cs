@@ -21,16 +21,16 @@ namespace ARPetGame
         private void SetupComponents()
         {
             if (uiManager == null)
-                uiManager = FindObjectOfType<UIManager>();
+                uiManager = FindFirstObjectByType<UIManager>();
                 
             if (screenDimmer == null)
-                screenDimmer = FindObjectOfType<ScreenDimmer>();
+                screenDimmer = FindFirstObjectByType<ScreenDimmer>();
                 
             if (gameManager == null)
-                gameManager = FindObjectOfType<ARGameManager>();
+                gameManager = FindFirstObjectByType<ARGameManager>();
                 
             if (petPlacer == null)
-                petPlacer = FindObjectOfType<PetPlacer>();
+                petPlacer = FindFirstObjectByType<PetPlacer>();
         }
         
         private void ConnectEvents()

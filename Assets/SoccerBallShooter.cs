@@ -20,9 +20,11 @@ public class SoccerBallShooter : MonoBehaviour
     private float touchStartTime;
 
     private static List<ARRaycastHit> hits = new List<ARRaycastHit>();
-
+public BallUIButtonCreator ballUIButtonCreator;
     void Update()
     {
+        if (ballUIButtonCreator != null && !ballUIButtonCreator.IsBallOn())
+          return;
         if (Input.touchCount == 0) return;
 
         Touch touch = Input.GetTouch(0);

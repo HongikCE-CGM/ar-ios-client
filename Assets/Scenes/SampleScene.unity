@@ -320,6 +320,9 @@ MonoBehaviour:
   stopThreshold: 0.1
   followDistance: 7.5
   yOffset: 0
+  closeFollowDistance: 2
+  frontBoostMultiplier: 1.5
+  followSmoothTime: 0.6
   feederController: {fileID: 645435324}
 --- !u!4 &645435323 stripped
 Transform:
@@ -340,6 +343,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 1.5
   stopDistance: 0.2
+--- !u!65 &645435325
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 645435320}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0.4, z: 0}
+--- !u!114 &645435326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 645435320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a56bd8a4c30974d2faefa3e3a7f1e33c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 645435321}
+  reactDistance: 1
+  headbuttForce: 5
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -805,6 +844,8 @@ MonoBehaviour:
   flightDuration: 1.2
   arRaycastManager: {fileID: 586014098}
   petFeederController: {fileID: 645435324}
+  tapTimeThreshold: 0.3
+  tapDistanceThreshold: 30
 --- !u!4 &1499897483
 Transform:
   m_ObjectHideFlags: 0
@@ -812,6 +853,57 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1499897481}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.50752, y: 0, z: -3.79255}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1828601335
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1828601337}
+  - component: {fileID: 1828601336}
+  m_Layer: 0
+  m_Name: SoccerBallShooter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1828601336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828601335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52d94f626776b476d96e7f28ee44c6dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soccerBallPrefab: {fileID: 1975457108487340, guid: ec3e8f3ed27e2244caaedaf589590a03, type: 3}
+  petTransform: {fileID: 645435323}
+  swipeThreshold: 50
+  minSwipeTime: 0.1
+  maxSwipeTime: 1
+  ballForce: 5
+  arRaycastManager: {fileID: 586014098}
+--- !u!4 &1828601337
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828601335}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.50752, y: 0, z: -3.79255}
@@ -921,6 +1013,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 645435324}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 645435325}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 645435326}
   m_SourcePrefab: {fileID: 100100000, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -933,3 +1031,4 @@ SceneRoots:
   - {fileID: 223974228}
   - {fileID: 2065508197}
   - {fileID: 1499897483}
+  - {fileID: 1828601337}

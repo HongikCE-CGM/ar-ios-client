@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections; 
 
 public class FeedSpawner : MonoBehaviour
 {
@@ -17,18 +17,46 @@ public class FeedSpawner : MonoBehaviour
     [Header("AR 매니저")]
     public ARRaycastManager arRaycastManager;
 
-    public PetFeederController petFeederController; // ✅ 여기 연결
+    public PetFeederController petFeederController;
 
     private static List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
+    private Vector2 touchStartPos;
+    private float touchStartTime;
+
+    // ✅ 터치 판단 기준
+    public float tapTimeThreshold = 0.3f;
+    public float tapDistanceThreshold = 30f;
+
     void Update()
     {
-        if (Input.touchCount == 0 || Input.GetTouch(0).phase != TouchPhase.Began)
-            return;
+        if (Input.touchCount == 0) return;
 
-        Vector2 touchPos = Input.GetTouch(0).position;
+        Touch touch = Input.GetTouch(0);
 
-        if (arRaycastManager.Raycast(touchPos, hits, TrackableType.PlaneWithinPolygon))
+        switch (touch.phase)
+        {
+            case TouchPhase.Began:
+                touchStartPos = touch.position;
+                touchStartTime = Time.time;
+                break;
+
+            case TouchPhase.Ended:
+                float duration = Time.time - touchStartTime;
+                float distance = (touch.position - touchStartPos).magnitude;
+
+                if (duration < tapTimeThreshold && distance < tapDistanceThreshold)
+                {
+                    TrySpawnFeed(touch.position);
+                }
+                break;
+        }
+    }
+
+    // ✅ 햄버거 생성 진입 함수
+    void TrySpawnFeed(Vector2 screenPos)
+    {
+        if (arRaycastManager.Raycast(screenPos, hits, TrackableType.PlaneWithinPolygon))
         {
             Pose hitPose = hits[0].pose;
             SpawnAndFlyToPet(hitPose.position);
@@ -39,15 +67,10 @@ public class FeedSpawner : MonoBehaviour
     {
         GameObject hamburger = Instantiate(hamburgerPrefab, spawnPos, Quaternion.identity);
 
-        // 펫 근처 랜덤 위치 계산
         Vector2 offset = Random.insideUnitCircle * dropRadius;
         Vector3 targetPos = petTransform.position + new Vector3(offset.x, 0f, offset.y);
 
-        // ✅ 먹이 비행 → 착지 후 → 펫 이동
         StartCoroutine(FlyToTarget(hamburger.transform, targetPos, hamburger));
-
-         // ✅ 핵심 코드
-        petFeederController.MoveToTarget(targetPos, hamburger);
     }
 
     IEnumerator FlyToTarget(Transform obj, Vector3 targetPos, GameObject hamburger)
@@ -59,8 +82,7 @@ public class FeedSpawner : MonoBehaviour
         {
             float t = Mathf.SmoothStep(0, 1, elapsed / flightDuration);
             Vector3 midPoint = Vector3.Lerp(startPos, targetPos, t);
-            midPoint.y += Mathf.Sin(t * Mathf.PI) * 0.5f;  // 포물선 곡선
-
+            midPoint.y += Mathf.Sin(t * Mathf.PI) * 0.5f;
             obj.position = midPoint;
             elapsed += Time.deltaTime;
             yield return null;
@@ -68,10 +90,9 @@ public class FeedSpawner : MonoBehaviour
 
         obj.position = targetPos;
 
-        yield return new WaitForSeconds(0.6f); // ✅ 착지 후 반응 딜레이
-
-        // ✅ 비행 완료 후에 펫에게 이동 명령
+        yield return new WaitForSeconds(0.6f);
         petFeederController.MoveToTarget(targetPos, hamburger);
     }
 }
+
 

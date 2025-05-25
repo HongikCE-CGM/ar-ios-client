@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Pet
+  - Ball
   layers:
   - Default
   - TransparentFX

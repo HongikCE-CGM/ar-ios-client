@@ -182,6 +182,14 @@ public class PetPlacer : MonoBehaviour
             if (placementIndicator != null)
                 placementIndicator.SetActive(false);
 
+            // FeedSpawner에 펫 정보 전달
+            FeedSpawner feedSpawner = FindFirstObjectByType<FeedSpawner>();
+            if (feedSpawner != null && feedSpawner.petTransform == null)
+            {
+                feedSpawner.petTransform = spawnedPet.transform;
+                Debug.Log("🔗 FeedSpawner에 펫 연결됨");
+            }
+
             Debug.Log("✅ 펫이 AR 평면에 성공적으로 배치되었습니다!");
         }
         else

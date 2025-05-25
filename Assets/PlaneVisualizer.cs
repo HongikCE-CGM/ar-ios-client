@@ -35,12 +35,8 @@ public class PlaneVisualizer : MonoBehaviour
         
         // 머티리얼 설정 (더 밝고 눈에 띄게)
         Renderer renderer = dot.GetComponent<Renderer>();
-        Material dotMat = new Material(Shader.Find("Standard"));
-        dotMat.color = Color.cyan;
-        dotMat.SetFloat("_Metallic", 0.0f);
-        dotMat.SetFloat("_Smoothness", 0.9f);
-        dotMat.EnableKeyword("_EMISSION");
-        dotMat.SetColor("_EmissionColor", Color.cyan * 0.3f); // 발광 효과
+        Material dotMat = new Material(Shader.Find("Unlit/Color"));
+        dotMat.color = new Color(0f, 1f, 1f, 0.8f); // 밝은 청록색, 약간 투명
         renderer.material = dotMat;
         
         // Collider 제거 (필요없음)
@@ -130,9 +126,13 @@ public class PlaneVisualizer : MonoBehaviour
         Vector3 center = plane.center;
         Vector3 size = plane.size;
         
+        // 크기가 너무 작으면 최소값 설정
+        if (size.x < 0.1f) size.x = 0.5f;
+        if (size.z < 0.1f) size.z = 0.5f;
+        
         // 점들을 격자 형태로 배치 (최대 개수 제한)
-        int dotsX = Mathf.Max(1, Mathf.Min(10, Mathf.RoundToInt(size.x / dotSpacing)));
-        int dotsZ = Mathf.Max(1, Mathf.Min(10, Mathf.RoundToInt(size.z / dotSpacing)));
+        int dotsX = Mathf.Max(1, Mathf.Min(8, Mathf.RoundToInt(size.x / dotSpacing)));
+        int dotsZ = Mathf.Max(1, Mathf.Min(8, Mathf.RoundToInt(size.z / dotSpacing)));
         
         for (int x = 0; x < dotsX; x++)
         {
@@ -140,7 +140,7 @@ public class PlaneVisualizer : MonoBehaviour
             {
                 Vector3 localPos = new Vector3(
                     (x - dotsX * 0.5f + 0.5f) * dotSpacing,
-                    0.01f, // 평면보다 약간 위에
+                    0.02f, // 평면보다 더 위에
                     (z - dotsZ * 0.5f + 0.5f) * dotSpacing
                 );
                 
@@ -148,10 +148,13 @@ public class PlaneVisualizer : MonoBehaviour
                 Vector3 worldPos = plane.transform.TransformPoint(localPos);
                 
                 // 점 생성
-                GameObject dot = Instantiate(dotPrefab, worldPos, plane.transform.rotation);
+                GameObject dot = Instantiate(dotPrefab, worldPos, Quaternion.identity);
                 dot.SetActive(true);
                 dot.transform.SetParent(plane.transform);
                 dot.name = $"PlaneDot_{x}_{z}";
+                
+                // 크기를 더 크게 설정
+                dot.transform.localScale = Vector3.one * (dotSize * 1.5f);
                 
                 planeDots[plane].Add(dot);
             }

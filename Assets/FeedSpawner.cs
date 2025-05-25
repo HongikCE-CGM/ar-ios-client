@@ -23,6 +23,10 @@ public class FeedSpawner : MonoBehaviour
 
     void Update()
     {
+        // 펫이 아직 배치되지 않았으면 먹이 생성 비활성화
+        if (petTransform == null || !petTransform.gameObject.activeInHierarchy)
+            return;
+            
         if (Input.touchCount == 0 || Input.GetTouch(0).phase != TouchPhase.Began)
             return;
 
@@ -32,6 +36,7 @@ public class FeedSpawner : MonoBehaviour
         {
             Pose hitPose = hits[0].pose;
             SpawnAndFlyToPet(hitPose.position);
+            Debug.Log("🍔 먹이 생성됨: " + hitPose.position);
         }
     }
 

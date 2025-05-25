@@ -176,6 +176,8 @@ GameObject:
   - component: {fileID: 586014098}
   - component: {fileID: 586014097}
   - component: {fileID: 586014096}
+  - component: {fileID: 586014102}
+  - component: {fileID: 586014101}
   m_Layer: 0
   m_Name: XR Origin
   m_TagString: Untagged
@@ -277,6 +279,35 @@ Transform:
   - {fileID: 1997398999}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &586014101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586014095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8dd85a78ee394378828dd536794c240, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dotPrefab: {fileID: 0}
+  dotSpacing: 0.3
+  planeMaterial: {fileID: 0}
+--- !u!114 &586014102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586014095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 046a0996fdc6a4e2a87f5c39e0a64684, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  petPrefab: {fileID: 0}
+  placementIndicator: {fileID: 0}
 --- !u!1 &645435320 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
@@ -320,6 +351,9 @@ MonoBehaviour:
   stopThreshold: 0.1
   followDistance: 7.5
   yOffset: 0
+  closeFollowDistance: 2
+  frontBoostMultiplier: 1.5
+  followSmoothTime: 0.5
   feederController: {fileID: 645435324}
 --- !u!4 &645435323 stripped
 Transform:

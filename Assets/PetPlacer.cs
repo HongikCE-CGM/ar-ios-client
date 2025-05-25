@@ -7,6 +7,7 @@ public class PetPlacer : MonoBehaviour
 {
     [Header("Pet Placement")]
     public GameObject petPrefab; // Inspector에서 연결할 프리팹
+    public GameObject existingPet; // 이미 씬에 있는 펫 (옵션)
     
     [Header("Placement Indicator")]
     public GameObject placementIndicator; // 배치 위치 표시자
@@ -16,6 +17,7 @@ public class PetPlacer : MonoBehaviour
     private ARPlaneManager planeManager;
     private List<ARRaycastHit> hits = new List<ARRaycastHit>();
     private bool hasDetectedPlanes = false;
+    private bool petPlaced = false;
 
     void Awake()
     {
@@ -31,6 +33,19 @@ public class PetPlacer : MonoBehaviour
     
     void Start()
     {
+        // 기존 펫이 있으면 찾기
+        if (existingPet == null)
+        {
+            existingPet = GameObject.FindGameObjectWithTag("Pet");
+        }
+        
+        // 기존 펫이 있으면 비활성화 (평면 감지 후 배치할 때까지)
+        if (existingPet != null)
+        {
+            existingPet.SetActive(false);
+            Debug.Log("🐑 기존 펫을 찾았습니다. 평면 감지 후 배치됩니다.");
+        }
+        
         // 배치 표시자 비활성화
         if (placementIndicator != null)
             placementIndicator.SetActive(false);
@@ -77,7 +92,7 @@ public class PetPlacer : MonoBehaviour
         CheckForPlanes();
         
         // 이미 배치된 경우 더 이상 배치하지 않음
-        if (spawnedPet != null)
+        if (petPlaced)
         {
             if (placementIndicator != null)
                 placementIndicator.SetActive(false);
@@ -136,18 +151,38 @@ public class PetPlacer : MonoBehaviour
         {
             Pose hitPose = hits[0].pose;
 
-            // 펫 배치
-            spawnedPet = Instantiate(petPrefab, hitPose.position, hitPose.rotation);
+            // 기존 펫이 있으면 이동, 없으면 새로 생성
+            if (existingPet != null)
+            {
+                spawnedPet = existingPet;
+                spawnedPet.transform.position = hitPose.position;
+                spawnedPet.transform.rotation = hitPose.rotation;
+                spawnedPet.SetActive(true);
+                Debug.Log("🐑 기존 펫을 평면에 배치했습니다: " + hitPose.position);
+            }
+            else if (petPrefab != null)
+            {
+                spawnedPet = Instantiate(petPrefab, hitPose.position, hitPose.rotation);
+                Debug.Log("🐑 새 펫을 평면에 배치했습니다: " + hitPose.position);
+            }
+            else
+            {
+                Debug.LogWarning("❌ 펫 프리팹이나 기존 펫이 없습니다!");
+                return;
+            }
 
             // 카메라 방향으로 회전
             spawnedPet.transform.LookAt(Camera.main.transform);
             spawnedPet.transform.rotation = Quaternion.Euler(0, spawnedPet.transform.eulerAngles.y, 0);
 
+            // 배치 완료 표시
+            petPlaced = true;
+
             // 배치 표시자 비활성화
             if (placementIndicator != null)
                 placementIndicator.SetActive(false);
 
-            Debug.Log("🐑 펫이 배치되었습니다: " + hitPose.position);
+            Debug.Log("✅ 펫이 AR 평면에 성공적으로 배치되었습니다!");
         }
         else
         {

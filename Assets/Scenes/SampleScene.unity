@@ -292,7 +292,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dotPrefab: {fileID: 0}
-  dotSpacing: 0.3
+  dotSpacing: 0.4
+  dotSize: 0.1
   planeMaterial: {fileID: 0}
 --- !u!114 &586014102
 MonoBehaviour:
@@ -307,6 +308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   petPrefab: {fileID: 0}
+  existingPet: {fileID: 645435320}
   placementIndicator: {fileID: 0}
 --- !u!1 &645435320 stripped
 GameObject:

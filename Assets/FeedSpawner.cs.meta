@@ -1,2 +1,15 @@
 fileFormatVersion: 2
 guid: 527419a55b7c54dcfbc428f65db98251
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - hamburgerPrefab: {instanceID: 0}
+  - petTransform: {instanceID: 0}
+  - arRaycastManager: {instanceID: 0}
+  - petFeederController: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,2 +1,14 @@
 fileFormatVersion: 2
 guid: 52d94f626776b476d96e7f28ee44c6dd
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - soccerBallPrefab: {fileID: 8351614467266362696, guid: 3a620b31ac4dc4ad5944c0fb11817135, type: 3}
+  - petTransform: {instanceID: 0}
+  - arRaycastManager: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

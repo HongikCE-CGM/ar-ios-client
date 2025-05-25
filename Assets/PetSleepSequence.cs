@@ -7,9 +7,28 @@ public class PetSleepSequence : MonoBehaviour
     private bool isTouchingPet = false;
     private Animator animator;
 
+    [Header("하트 설정")]
+    public string heartPrefabPath = "Heart2"; // ✅ Resources 폴더 내 경로
+    public Vector3 heartOffset = new Vector3(0, 0.8f, 0);
+    private GameObject heartPrefab;
+    private GameObject heartInstance;
+
     void Start()
     {
         animator = GetComponent<Animator>();
+
+        // ✅ Resources에서 하트 프리팹 로드
+        heartPrefab = Resources.Load<GameObject>(heartPrefabPath);
+
+        if (heartPrefab != null)
+        {
+            heartInstance = Instantiate(heartPrefab, transform.position + heartOffset, Quaternion.identity);
+            heartInstance.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ 하트 프리팹을 Resources에서 불러올 수 없습니다. 경로 확인: " + heartPrefabPath);
+        }
     }
 
     void Update()
@@ -35,11 +54,16 @@ public class PetSleepSequence : MonoBehaviour
 
                 if (dragDistance > dragThreshold && animator.GetBool("isSitting") && !animator.GetBool("isSleeping"))
                 {
-                    // ✅ 수면 시퀀스 시작
                     animator.SetTrigger("startSleep");
-
-                    // ✅ 누운 상태 플래그는 이후 LieDown 상태 진입 시 On
                     isTouchingPet = false;
+
+                    if (heartInstance != null)
+                    {
+                        heartInstance.transform.position = transform.position + heartOffset;
+                        heartInstance.SetActive(true);
+                        CancelInvoke(nameof(HideHeart));
+                        Invoke(nameof(HideHeart), 4f);
+                    }
                 }
                 break;
 
@@ -47,6 +71,19 @@ public class PetSleepSequence : MonoBehaviour
             case TouchPhase.Canceled:
                 isTouchingPet = false;
                 break;
+        }
+
+        if (heartInstance != null && heartInstance.activeSelf)
+        {
+            heartInstance.transform.position = transform.position + heartOffset;
+        }
+    }
+
+    private void HideHeart()
+    {
+        if (heartInstance != null)
+        {
+            heartInstance.SetActive(false);
         }
     }
 
@@ -56,4 +93,3 @@ public class PetSleepSequence : MonoBehaviour
         return Physics.Raycast(ray, out RaycastHit hit) && hit.collider.gameObject == this.gameObject;
     }
 }
-

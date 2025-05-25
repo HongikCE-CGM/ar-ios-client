@@ -8,6 +8,7 @@ public class SoccerBallShooter : MonoBehaviour
     [Header("프리팹 & 설정")]
     public GameObject soccerBallPrefab;
     public Transform petTransform;
+    public Animator petAnimator; // 👈 Animator를 인스펙터에 연결
     public float swipeThreshold = 50f;
     public float minSwipeTime = 0.1f;
     public float maxSwipeTime = 1.0f;
@@ -20,6 +21,8 @@ public class SoccerBallShooter : MonoBehaviour
     private float touchStartTime;
 
     private static List<ARRaycastHit> hits = new List<ARRaycastHit>();
+
+
 
     void Update()
     {
@@ -45,6 +48,8 @@ public class SoccerBallShooter : MonoBehaviour
                 }
                 break;
         }
+
+
     }
 
     void ShootBall()
@@ -57,6 +62,7 @@ public class SoccerBallShooter : MonoBehaviour
 
         GameObject ball = Instantiate(soccerBallPrefab, spawnPos, Quaternion.identity);
 
+    
         Rigidbody rb = ball.GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -70,7 +76,10 @@ public class SoccerBallShooter : MonoBehaviour
 
         rb.AddForce(launchDir * ballForce, ForceMode.Impulse);
 
+
+
     }
 
-}
 
+
+}

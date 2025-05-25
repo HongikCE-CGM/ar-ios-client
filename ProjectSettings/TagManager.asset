@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Pet
   - Ball
+  - Heart
   layers:
   - Default
   - TransparentFX

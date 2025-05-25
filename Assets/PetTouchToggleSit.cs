@@ -1,8 +1,9 @@
 using UnityEngine;
 
-public class PetTouchHandler : MonoBehaviour
+public class PetTouchToggleSit : MonoBehaviour
 {
     private Animator animator;
+    private bool isSitting = false;
 
     void Start()
     {
@@ -14,18 +15,20 @@ public class PetTouchHandler : MonoBehaviour
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 if (hit.collider != null && hit.collider.gameObject == this.gameObject)
                 {
-                    // ✅ 펫 터치됨 → sit 애니메이션 트리거
-                    if (animator != null)
-                        animator.SetTrigger("sit");
+                    ToggleSit();
                 }
             }
         }
     }
-}
 
+    void ToggleSit()
+    {
+        isSitting = !isSitting;
+        animator.SetBool("isSitting", isSitting);
+    }
+}
 

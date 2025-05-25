@@ -379,6 +379,18 @@ MonoBehaviour:
   animator: {fileID: 645435321}
   reactDistance: 1
   headbuttForce: 5
+--- !u!114 &645435327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 645435320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a1f5e923d48b4bc197f678057db1363, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1019,6 +1031,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 645435326}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 645435327}
   m_SourcePrefab: {fileID: 100100000, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

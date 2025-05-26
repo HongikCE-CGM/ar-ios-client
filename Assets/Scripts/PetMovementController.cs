@@ -19,7 +19,6 @@ public class PetMovementController : MonoBehaviour
     private bool isMoving = false;
     private float waitTimer = 0f;
     private Animator animator;
-    private Vector3 planeCenter;
     private Vector2 planeSize;
     
     void Start()
@@ -38,15 +37,13 @@ public class PetMovementController : MonoBehaviour
             float scaleFactor = baseScale + (planeArea * scaleMultiplier);
             scaleFactor = Mathf.Clamp(scaleFactor, 0.2f, 1.0f);
             transform.localScale = Vector3.one * scaleFactor;
-            
-            planeCenter = currentPlane.center;
+
             planeSize = currentPlane.size;
-            
-            Debug.Log($"[PetMovementController] Plane set - Center: {planeCenter}, Size: {planeSize}, Pet Scale: {scaleFactor}");
-            
-            // 초기 위치를 평면 중앙으로 설정
-            transform.position = currentPlane.transform.TransformPoint(planeCenter);
-            
+            Debug.Log($"[PetMovementController] Plane set - Size: {planeSize}, Pet Scale: {scaleFactor}");
+
+            // 초기 위치를 평면 중앙(ARPlane Transform 위치)으로 설정
+            transform.position = currentPlane.transform.position;
+
             // 첫 목표 위치 설정
             SetNewTargetPosition();
         }
@@ -54,24 +51,24 @@ public class PetMovementController : MonoBehaviour
     
     void Update()
     {
+        // **추가된 부분**: 앉거나 눕고 있으면 걸어다니지 않음
+        if (animator.GetBool("isSitting") || animator.GetBool("isSleeping"))
+        {
+            animator.SetBool("isWalking", false);
+            return;
+        }
+
         if (currentPlane == null) return;
-        
-        // 평면 정보 업데이트
-        planeCenter = currentPlane.center;
-        planeSize = currentPlane.size;
         
         if (!isMoving)
         {
             waitTimer -= Time.deltaTime;
-            if (waitTimer <= 0)
+            if (waitTimer <= 0f)
             {
                 SetNewTargetPosition();
                 isMoving = true;
-                if (animator != null)
-                {
-                    animator.SetBool("isWalking", true);
-                }
-                Debug.Log($"[PetMovementController] Starting movement to: {targetPosition}");
+                animator.SetBool("isWalking", true);
+                Debug.Log($"[PetMovementController] Moving to: {targetPosition}");
             }
         }
         else
@@ -80,74 +77,53 @@ public class PetMovementController : MonoBehaviour
         }
     }
     
-    void SetNewTargetPosition()
+    private void SetNewTargetPosition()
     {
-        // 평면 내에서 랜덤한 위치 선택
-        float randomX = Random.Range(-planeSize.x / 2 + boundaryPadding, planeSize.x / 2 - boundaryPadding);
-        float randomZ = Random.Range(-planeSize.y / 2 + boundaryPadding, planeSize.y / 2 - boundaryPadding);
-        
-        Vector3 localPosition = planeCenter + new Vector3(randomX, 0, randomZ);
-        targetPosition = currentPlane.transform.TransformPoint(localPosition);
-        
-        Debug.Log($"[PetMovementController] New target position set: Local({randomX}, 0, {randomZ}) -> World({targetPosition})");
+        float halfX = planeSize.x * 0.5f - boundaryPadding;
+        float halfZ = planeSize.y * 0.5f - boundaryPadding;
+        float randomX = Random.Range(-halfX, halfX);
+        float randomZ = Random.Range(-halfZ, halfZ);
+
+        Vector3 localOffset = new Vector3(randomX, 0f, randomZ);
+        targetPosition = currentPlane.transform.TransformPoint(localOffset);
+
+        waitTimer = Random.Range(minWaitTime, maxWaitTime);
     }
     
-    void MoveToTarget()
+    private void MoveToTarget()
     {
         Vector3 direction = (targetPosition - transform.position).normalized;
-        direction.y = 0; // Y축 이동 제거
-        
+        direction.y = 0f;
+
         float distance = Vector3.Distance(transform.position, targetPosition);
-        
         if (distance > 0.1f)
         {
-            // 이동
             transform.position += direction * moveSpeed * Time.deltaTime;
-            
-            // 회전
             if (direction != Vector3.zero)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                Quaternion look = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, look, rotationSpeed * Time.deltaTime);
             }
-            
-            // 평면 경계 체크
-            Vector3 localPos = currentPlane.transform.InverseTransformPoint(transform.position);
-            localPos.x = Mathf.Clamp(localPos.x, planeCenter.x - planeSize.x / 2 + boundaryPadding, 
-                                    planeCenter.x + planeSize.x / 2 - boundaryPadding);
-            localPos.z = Mathf.Clamp(localPos.z, planeCenter.z - planeSize.y / 2 + boundaryPadding, 
-                                    planeCenter.z + planeSize.y / 2 - boundaryPadding);
-            transform.position = currentPlane.transform.TransformPoint(localPos);
         }
         else
         {
-            // 목표 지점 도달
             isMoving = false;
-            waitTimer = Random.Range(minWaitTime, maxWaitTime);
-            if (animator != null)
-            {
-                animator.SetBool("isWalking", false);
-            }
-            Debug.Log($"[PetMovementController] Reached target. Waiting for {waitTimer} seconds");
+            animator.SetBool("isWalking", false);
+            Debug.Log($"[PetMovementController] Reached. Next wait: {waitTimer:F2}s");
         }
     }
     
     void OnDrawGizmos()
     {
-        if (currentPlane != null)
+        if (currentPlane == null) return;
+        Gizmos.color = Color.yellow;
+        Vector3 center = currentPlane.transform.position;
+        Vector3 size = new Vector3(planeSize.x, 0.01f, planeSize.y);
+        Gizmos.DrawWireCube(center, size);
+        if (isMoving)
         {
-            // 평면 경계 시각화
-            Gizmos.color = Color.yellow;
-            Vector3 worldCenter = currentPlane.transform.TransformPoint(planeCenter);
-            Vector3 worldSize = new Vector3(planeSize.x, 0.01f, planeSize.y);
-            Gizmos.DrawWireCube(worldCenter, worldSize);
-            
-            // 목표 위치 시각화
-            if (isMoving)
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(targetPosition, 0.1f);
-            }
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(targetPosition, 0.1f);
         }
     }
-} 
+}

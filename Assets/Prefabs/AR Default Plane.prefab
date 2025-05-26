@@ -15,13 +15,14 @@ GameObject:
   - component: {fileID: 8864569211406429992}
   - component: {fileID: 2470373721173092302}
   - component: {fileID: 4691303805027678992}
+  - component: {fileID: 3796394567515183592}
   m_Layer: 0
   m_Name: AR Default Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7222037949375006059
 Transform:
   m_ObjectHideFlags: 0
@@ -118,7 +119,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f1a110d32af21aa4d872c707dfcc6043, type: 2}
+  - {fileID: 2100000, guid: 2166f2a4aa6de4f559e94d7173fca686, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -247,3 +248,17 @@ LineRenderer:
   m_UseWorldSpace: 0
   m_Loop: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &3796394567515183592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5511265127175266098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d47bb768ffed9405080d74b405bb67a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  planeColor: {r: 0.2, g: 0.6, b: 1, a: 0.6}
+  selectedColor: {r: 0.2, g: 1, b: 0.2, a: 0.7}

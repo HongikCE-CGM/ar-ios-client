@@ -95,37 +95,17 @@ public class PetPlacementController : MonoBehaviour
     
     System.Collections.IEnumerator InitializePlanes()
     {
-        // 프레임 대기 (평면이 생성될 시간을 줌)
-        yield return new WaitForSeconds(0.5f);
+        // 더 긴 대기 시간으로 평면이 안정화될 때까지 기다림
+        yield return new WaitForSeconds(1.0f);
         
-        // 가장 큰 평면만 활성화
-        ARPlane largestPlane = null;
-        float largestArea = 0f;
-        
-        foreach (var plane in planeManager.trackables)
+        // 주기적으로 평면 상태 확인
+        for (int i = 0; i < 10; i++)
         {
-            float area = plane.size.x * plane.size.y;
-            if (area > largestArea)
-            {
-                largestArea = area;
-                largestPlane = plane;
-            }
+            UpdateActivePlane();
+            yield return new WaitForSeconds(0.2f);
         }
         
-        // 모든 평면을 숨기고 가장 큰 평면만 표시
-        foreach (var plane in planeManager.trackables)
-        {
-            if (plane == largestPlane)
-            {
-                plane.gameObject.SetActive(true);
-                Debug.Log($"[PetPlacementController] Keeping largest plane active: {plane.gameObject.name}, Area: {largestArea}");
-            }
-            else
-            {
-                plane.gameObject.SetActive(false);
-                Debug.Log($"[PetPlacementController] Hiding smaller plane: {plane.gameObject.name}");
-            }
-        }
+        Debug.Log("[PetPlacementController] Plane initialization completed");
     }
 
     void Update()
@@ -137,6 +117,12 @@ public class PetPlacementController : MonoBehaviour
                 placementIndicator.SetActive(false);
             }
             return;
+        }
+
+        // 실시간으로 카메라 중앙의 평면 업데이트 (0.5초마다)
+        if (Time.time % 0.5f < Time.deltaTime)
+        {
+            UpdateActivePlane();
         }
 
         HandleTouch();
@@ -338,30 +324,7 @@ public class PetPlacementController : MonoBehaviour
         
         foreach (ARPlane plane in args.added)
         {
-            Debug.Log($"[PetPlacementController] New plane added: {plane.gameObject.name}, Active: {plane.gameObject.activeSelf}");
-            
-            // 선택된 평면이 없으면 새 평면을 활성화
-            if (selectedPlane == null)
-            {
-                // 기존 평면들을 모두 숨김
-                foreach (var existingPlane in planeManager.trackables)
-                {
-                    if (existingPlane != plane)
-                    {
-                        existingPlane.gameObject.SetActive(false);
-                    }
-                }
-                
-                // 새 평면 활성화
-                plane.gameObject.SetActive(true);
-                Debug.Log($"[PetPlacementController] Activated new plane: {plane.gameObject.name}");
-            }
-            else
-            {
-                // 선택된 평면이 있으면 새 평면은 숨김
-                plane.gameObject.SetActive(false);
-                Debug.Log($"[PetPlacementController] Hiding new plane {plane.gameObject.name} as we have a selected plane");
-            }
+            Debug.Log($"[PetPlacementController] New plane added: {plane.gameObject.name}, TrackingState: {plane.trackingState}");
             
             // ARPlaneMeshVisualizer 컴포넌트 추가 (메시 생성을 위해)
             if (plane.GetComponent<ARPlaneMeshVisualizer>() == null)
@@ -376,50 +339,113 @@ public class PetPlacementController : MonoBehaviour
                 plane.gameObject.AddComponent<ARPlaneVisualizer>();
                 Debug.Log($"[PetPlacementController] Added ARPlaneVisualizer to plane: {plane.gameObject.name}");
             }
-            else
+        }
+        
+        // 모든 평면의 상태를 확인하고 가장 적합한 평면 선택
+        UpdateActivePlane();
+        
+        foreach (var removedPair in args.removed)
+        {
+            Debug.Log($"[PetPlacementController] Plane removed: {removedPair.Value?.gameObject.name}");
+            if (removedPair.Value == selectedPlane)
             {
-                Debug.Log($"[PetPlacementController] ARPlaneVisualizer already exists on plane: {plane.gameObject.name}");
+                selectedPlane = null;
+                Debug.Log("[PetPlacementController] Selected plane was removed, will find new active plane");
+                // 새로운 활성 평면 찾기
+                UpdateActivePlane();
             }
         }
         
         foreach (ARPlane plane in args.updated)
         {
-            // 선택되지 않은 평면이 업데이트되고 더 크면 전환
-            if (selectedPlane == null && plane.gameObject.activeSelf)
+            // 추적 상태가 변경된 평면 처리
+            if (plane.trackingState == TrackingState.Tracking)
             {
-                // 현재 활성화된 평면 찾기
-                ARPlane currentActivePlane = null;
-                foreach (var p in planeManager.trackables)
-                {
-                    if (p.gameObject.activeSelf && p != plane)
-                    {
-                        currentActivePlane = p;
-                        break;
-                    }
-                }
+                Debug.Log($"[PetPlacementController] Plane {plane.gameObject.name} is now tracking properly");
+                // 추적이 복구된 평면이 더 적합하면 전환
+                UpdateActivePlane();
+            }
+            else if (plane.trackingState == TrackingState.None)
+            {
+                Debug.Log($"[PetPlacementController] Plane {plane.gameObject.name} lost tracking");
+            }
+        }
+    }
+    
+    void UpdateActivePlane()
+    {
+        if (selectedPlane != null) return; // 이미 선택된 평면이 있으면 변경하지 않음
+        
+        ARPlane bestPlane = null;
+        float closestDistance = float.MaxValue;
+        
+        // 카메라 중앙에서 레이캐스트
+        Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        
+        foreach (var plane in planeManager.trackables)
+        {
+            // 추적 상태가 좋고 충분히 큰 평면만 고려
+            if (plane.trackingState == TrackingState.Tracking)
+            {
+                float area = plane.size.x * plane.size.y;
+                if (area < 0.2f) continue; // 너무 작은 평면은 제외
                 
-                // 새 평면이 더 크면 전환
-                if (currentActivePlane != null)
+                // 카메라에서 평면까지의 거리 계산
+                Vector3 planeCenter = plane.transform.TransformPoint(plane.center);
+                Vector3 cameraPosition = arCamera.transform.position;
+                float distance = Vector3.Distance(cameraPosition, planeCenter);
+                
+                // 카메라 중앙에서 평면으로 레이캐스트하여 실제로 보이는지 확인
+                if (raycastManager.Raycast(screenCenter, hits, TrackableType.PlaneWithinPolygon))
                 {
-                    float currentArea = currentActivePlane.size.x * currentActivePlane.size.y;
-                    float newArea = plane.size.x * plane.size.y;
-                    
-                    if (newArea > currentArea * 1.5f) // 1.5배 이상 크면 전환
+                    foreach (var hit in hits)
                     {
-                        currentActivePlane.gameObject.SetActive(false);
-                        plane.gameObject.SetActive(true);
-                        Debug.Log($"[PetPlacementController] Switched to larger plane: {plane.gameObject.name} (Area: {newArea} vs {currentArea})");
+                        ARPlane hitPlane = planeManager.GetPlane(hit.trackableId);
+                        if (hitPlane == plane && distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            bestPlane = plane;
+                            break;
+                        }
                     }
                 }
             }
         }
         
-        foreach (var removedPair in args.removed)
+        // 레이캐스트로 찾지 못했다면 가장 가까운 평면 사용
+        if (bestPlane == null)
         {
-            if (removedPair.Value == selectedPlane)
+            foreach (var plane in planeManager.trackables)
             {
-                selectedPlane = null;
-                Debug.Log("[PetPlacementController] Selected plane was removed");
+                if (plane.trackingState == TrackingState.Tracking)
+                {
+                    float area = plane.size.x * plane.size.y;
+                    if (area < 0.2f) continue;
+                    
+                    Vector3 planeCenter = plane.transform.TransformPoint(plane.center);
+                    Vector3 cameraPosition = arCamera.transform.position;
+                    float distance = Vector3.Distance(cameraPosition, planeCenter);
+                    
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        bestPlane = plane;
+                    }
+                }
+            }
+        }
+        
+        // 모든 평면을 숨기고 카메라 중앙에 가장 가까운 평면만 표시
+        foreach (var plane in planeManager.trackables)
+        {
+            if (plane == bestPlane && plane.trackingState == TrackingState.Tracking)
+            {
+                plane.gameObject.SetActive(true);
+                Debug.Log($"[PetPlacementController] Activated closest plane to camera center: {plane.gameObject.name}, Distance: {closestDistance:F2}m, Area: {plane.size.x * plane.size.y:F2}");
+            }
+            else
+            {
+                plane.gameObject.SetActive(false);
             }
         }
     }

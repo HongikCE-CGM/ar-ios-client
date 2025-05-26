@@ -10,39 +10,55 @@ public class PetPlacementController : MonoBehaviour
     public GameObject petPrefab;
     public Camera arCamera;
     public GameObject placementIndicatorPrefab;
+    public GameObject planePrefab; // 평면 시각화용 프리팹
 
     private List<ARRaycastHit> hits = new List<ARRaycastHit>();
     private bool petPlaced = false;
     private GameObject spawnedPet;
     private GameObject placementIndicator;
+    private ARPlane selectedPlane;
+    private PetMovementController petMovementController;
 
     void Awake()
     {
+        Debug.Log("[PetPlacementController] Awake called");
+        
         if (planeManager == null)
         {
-            planeManager = FindObjectOfType<ARPlaneManager>();
+            planeManager = FindFirstObjectByType<ARPlaneManager>();
+            Debug.Log($"[PetPlacementController] ARPlaneManager found: {planeManager != null}");
         }
         if (raycastManager == null)
         {
-            raycastManager = FindObjectOfType<ARRaycastManager>();
+            raycastManager = FindFirstObjectByType<ARRaycastManager>();
+            Debug.Log($"[PetPlacementController] ARRaycastManager found: {raycastManager != null}");
         }
 
         if (arCamera == null)
         {
             arCamera = Camera.main;
+            Debug.Log($"[PetPlacementController] Camera found: {arCamera != null}");
         }
         
         if (petPrefab == null)
         {
-            Debug.LogError("Pet Prefab is not assigned.");
+            Debug.LogError("[PetPlacementController] Pet Prefab is not assigned!");
             enabled = false;
             return;
+        }
+
+        // 평면 프리팹 설정
+        if (planePrefab == null && planeManager != null)
+        {
+            planePrefab = planeManager.planePrefab;
+            Debug.Log($"[PetPlacementController] Using plane prefab from ARPlaneManager");
         }
 
         if (placementIndicatorPrefab != null)
         {
             placementIndicator = Instantiate(placementIndicatorPrefab);
             placementIndicator.SetActive(false);
+            Debug.Log("[PetPlacementController] Placement indicator created");
         }
     }
 
@@ -50,7 +66,8 @@ public class PetPlacementController : MonoBehaviour
     {
         if (planeManager != null)
         {
-            planeManager.planesChanged += OnPlanesChanged;
+            planeManager.trackablesChanged.AddListener(OnPlanesChanged);
+            Debug.Log("[PetPlacementController] Subscribed to trackablesChanged event");
         }
     }
 
@@ -58,7 +75,7 @@ public class PetPlacementController : MonoBehaviour
     {
         if (planeManager != null)
         {
-            planeManager.planesChanged -= OnPlanesChanged;
+            planeManager.trackablesChanged.RemoveListener(OnPlanesChanged);
         }
     }
 
@@ -68,6 +85,7 @@ public class PetPlacementController : MonoBehaviour
         {
             petPrefab.SetActive(false);
         }
+        Debug.Log("[PetPlacementController] Start completed");
     }
 
     void Update()
@@ -85,6 +103,7 @@ public class PetPlacementController : MonoBehaviour
 
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
+            Debug.Log("[PetPlacementController] Touch detected");
             if (placementIndicator != null && placementIndicator.activeSelf)
             {
                 PlacePetAtIndicator();
@@ -100,6 +119,20 @@ public class PetPlacementController : MonoBehaviour
         if (raycastManager.Raycast(screenCenter, hits, TrackableType.PlaneWithinPolygon))
         {
             Pose hitPose = hits[0].pose;
+            
+            // 현재 레이캐스트가 맞은 평면 찾기
+            ARPlane hitPlane = null;
+            if (hits[0].trackableId != TrackableId.invalidId)
+            {
+                hitPlane = planeManager.GetPlane(hits[0].trackableId);
+            }
+            
+            if (hitPlane != null && hitPlane != selectedPlane)
+            {
+                // 새로운 평면 선택
+                SelectPlane(hitPlane);
+            }
+            
             if (placementIndicator != null)
             {
                 placementIndicator.transform.position = hitPose.position;
@@ -116,45 +149,78 @@ public class PetPlacementController : MonoBehaviour
         }
     }
 
+    void SelectPlane(ARPlane plane)
+    {
+        selectedPlane = plane;
+        
+        // 모든 평면의 시각화를 비활성화하고 선택된 평면만 활성화
+        foreach (var trackablePlane in planeManager.trackables)
+        {
+            var visualizer = trackablePlane.GetComponent<ARPlaneVisualizer>();
+            if (visualizer != null)
+            {
+                visualizer.SetVisualizationActive(trackablePlane == selectedPlane);
+            }
+        }
+        
+        Debug.Log($"[PetPlacementController] Selected plane: {plane.gameObject.name}, Size: {plane.size}");
+    }
+
     void PlacePetAtIndicator()
     {
-        if (placementIndicator == null || !placementIndicator.activeSelf) return;
+        if (placementIndicator == null || !placementIndicator.activeSelf || selectedPlane == null) 
+        {
+            Debug.LogWarning("[PetPlacementController] Cannot place pet - missing indicator or plane");
+            return;
+        }
 
         Pose placementPose = new Pose(placementIndicator.transform.position, placementIndicator.transform.rotation);
         PlacePet(placementPose);
     }
 
-    void OnPlanesChanged(ARPlanesChangedEventArgs args)
+    void OnPlanesChanged(ARTrackablesChangedEventArgs<ARPlane> args)
     {
+        Debug.Log($"[PetPlacementController] Planes changed - Added: {args.added.Count}, Updated: {args.updated.Count}, Removed: {args.removed.Count}");
+        
         foreach (ARPlane plane in args.added)
         {
-            plane.gameObject.SetActive(true);
-            EnablePlaneVisuals(plane);
+            // ARPlaneVisualizer 컴포넌트 추가
+            if (plane.GetComponent<ARPlaneVisualizer>() == null)
+            {
+                plane.gameObject.AddComponent<ARPlaneVisualizer>();
+                Debug.Log($"[PetPlacementController] Added ARPlaneVisualizer to plane: {plane.gameObject.name}");
+            }
+            
+            // 초기에는 모든 평면 시각화 비활성화
+            var visualizer = plane.GetComponent<ARPlaneVisualizer>();
+            if (visualizer != null)
+            {
+                visualizer.SetVisualizationActive(false);
+            }
         }
+        
         foreach (ARPlane plane in args.updated)
         {
-            EnablePlaneVisuals(plane);
+            Debug.Log($"[PetPlacementController] Plane updated: {plane.gameObject.name}, Size: {plane.size}");
         }
-    }
-
-    void EnablePlaneVisuals(ARPlane plane)
-    {
-        MeshRenderer meshRenderer = plane.GetComponentInChildren<MeshRenderer>();
-        if (meshRenderer != null)
+        
+        foreach (var removedPair in args.removed)
         {
-            meshRenderer.enabled = true;
-        }
-
-        LineRenderer lineRenderer = plane.GetComponentInChildren<LineRenderer>();
-        if (lineRenderer != null)
-        {
-            lineRenderer.enabled = true;
+            if (removedPair.Value == selectedPlane)
+            {
+                selectedPlane = null;
+                Debug.Log("[PetPlacementController] Selected plane was removed");
+            }
         }
     }
 
     void PlacePet(Pose pose)
     {
-        if (petPrefab == null) return;
+        if (petPrefab == null || selectedPlane == null) 
+        {
+            Debug.LogError("[PetPlacementController] Cannot place pet - missing prefab or selected plane");
+            return;
+        }
 
         if (petPrefab.scene.IsValid())
         {
@@ -168,6 +234,8 @@ public class PetPlacementController : MonoBehaviour
         if (spawnedPet != null)
         {
             spawnedPet.transform.position = pose.position;
+            
+            // 카메라를 향하도록 회전
             Vector3 cameraPosition = arCamera.transform.position;
             Vector3 directionToCamera = (cameraPosition - spawnedPet.transform.position).normalized;
             directionToCamera.y = 0; 
@@ -180,13 +248,32 @@ public class PetPlacementController : MonoBehaviour
                 spawnedPet.transform.rotation = pose.rotation;
             }
 
+            // PetMovementController 추가 및 설정
+            petMovementController = spawnedPet.GetComponent<PetMovementController>();
+            if (petMovementController == null)
+            {
+                petMovementController = spawnedPet.AddComponent<PetMovementController>();
+            }
+            petMovementController.SetPlane(selectedPlane);
+
             spawnedPet.SetActive(true);
             petPlaced = true;
-            Debug.Log($"Pet placed at {pose.position}");
+            
+            Debug.Log($"[PetPlacementController] Pet placed at {pose.position} on plane {selectedPlane.gameObject.name}");
 
             if (placementIndicator != null)
             {
                 placementIndicator.SetActive(false);
+            }
+            
+            // 모든 평면 시각화 비활성화
+            foreach (var trackablePlane in planeManager.trackables)
+            {
+                var visualizer = trackablePlane.GetComponent<ARPlaneVisualizer>();
+                if (visualizer != null)
+                {
+                    visualizer.SetVisualizationActive(false);
+                }
             }
         }
     }

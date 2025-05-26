@@ -301,7 +301,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_PlanePrefab: {fileID: 5511265127175266098, guid: e15ae4afa9851462393d0aeec01936ec, type: 3}
+  m_PlanePrefab: {fileID: 5511265127175266098, guid: f46ff660fb51b4f489bd46c9a6d0db56, type: 3}
   m_DetectionMode: -1
 --- !u!114 &586014097
 MonoBehaviour:
@@ -385,6 +385,7 @@ MonoBehaviour:
   petPrefab: {fileID: 645435320}
   arCamera: {fileID: 1280847689}
   placementIndicatorPrefab: {fileID: 5511265127175266098, guid: e15ae4afa9851462393d0aeec01936ec, type: 3}
+  planePrefab: {fileID: 0}
 --- !u!1 &645435320 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
@@ -513,6 +514,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragThreshold: 60
   sleepUIButtonCreator: {fileID: 1114040581}
+--- !u!114 &645435329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 645435320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc2a7982e541d496f8d5a1a41cde1d91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 1
+  rotationSpeed: 90
+  minWaitTime: 2
+  maxWaitTime: 5
+  boundaryPadding: 0.1
+  baseScale: 0.3
+  scaleMultiplier: 0.5
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1039,6 +1059,56 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1517151778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1517151780}
+  - component: {fileID: 1517151779}
+  m_Layer: 0
+  m_Name: PetPlacementController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1517151779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1517151778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c021bf3c8d42490f9cb88ef1efaef73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  planeManager: {fileID: 0}
+  raycastManager: {fileID: 0}
+  petPrefab: {fileID: 0}
+  arCamera: {fileID: 0}
+  placementIndicatorPrefab: {fileID: 0}
+  planePrefab: {fileID: 0}
+--- !u!4 &1517151780
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1517151778}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1828601335
 GameObject:
   m_ObjectHideFlags: 0
@@ -1204,6 +1274,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 645435328}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 645435329}
   m_SourcePrefab: {fileID: 100100000, guid: 85f56a86adb99ac469de265a0a1b9a16, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -1220,3 +1293,4 @@ SceneRoots:
   - {fileID: 40919616}
   - {fileID: 65284395}
   - {fileID: 1114040582}
+  - {fileID: 1517151780}

@@ -110,6 +110,14 @@ public class ARPlaneVisualizer : MonoBehaviour
     {
         Debug.Log($"[ARPlaneVisualizer] Start called for {gameObject.name}, GameObject active: {gameObject.activeSelf}");
         
+        // LineRenderer 비활성화 (검정색 아웃라인 제거)
+        LineRenderer lineRenderer = GetComponent<LineRenderer>();
+        if (lineRenderer != null)
+        {
+            lineRenderer.enabled = false;
+            Debug.Log($"[ARPlaneVisualizer] LineRenderer disabled in Start for {gameObject.name}");
+        }
+        
         // GameObject가 비활성화되어 있다면 활성화
         if (!gameObject.activeSelf)
         {

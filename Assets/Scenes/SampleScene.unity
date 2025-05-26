@@ -302,7 +302,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   m_PlanePrefab: {fileID: 5511265127175266098, guid: e15ae4afa9851462393d0aeec01936ec, type: 3}
-  m_DetectionMode: -1
+  m_DetectionMode: 1
 --- !u!114 &586014097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1088,10 +1088,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c021bf3c8d42490f9cb88ef1efaef73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planeManager: {fileID: 0}
-  raycastManager: {fileID: 0}
-  petPrefab: {fileID: 0}
-  arCamera: {fileID: 0}
+  planeManager: {fileID: 586014096}
+  raycastManager: {fileID: 586014098}
+  petPrefab: {fileID: 645435320}
+  arCamera: {fileID: 1280847689}
   placementIndicatorPrefab: {fileID: 0}
   planePrefab: {fileID: 0}
 --- !u!4 &1517151780

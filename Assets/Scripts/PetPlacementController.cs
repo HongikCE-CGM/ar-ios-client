@@ -249,13 +249,27 @@ public class PetPlacementController : MonoBehaviour
         
         if (spawnedPet != null)
         {
-            // 펫의 위치를 평면 위에 정확히 배치 (Y 오프셋 최소화)
+            // 펫의 위치를 평면 위에 정확히 배치
             Vector3 petPosition = pose.position;
-            // 펫의 바닥이 평면에 거의 닿도록 조정
-            petPosition.y = pose.position.y; // 오프셋 제거, 평면에 바로 배치
+            
+            // 펫의 Renderer bounds를 확인하여 정확한 높이 계산
+            Renderer petRenderer = spawnedPet.GetComponentInChildren<Renderer>();
+            if (petRenderer != null)
+            {
+                // 펫의 바운드 박스 하단이 평면에 닿도록 조정
+                float petBottomOffset = petRenderer.bounds.center.y - petRenderer.bounds.min.y;
+                petPosition.y = pose.position.y + petBottomOffset;
+                Debug.Log($"[PetPlacementController] Pet bounds offset: {petBottomOffset}, Final Y: {petPosition.y}");
+            }
+            else
+            {
+                // Renderer가 없으면 기본값 사용
+                petPosition.y = pose.position.y;
+                Debug.LogWarning("[PetPlacementController] No renderer found on pet, using default position");
+            }
             
             spawnedPet.transform.position = petPosition;
-            Debug.Log($"[PetPlacementController] Pet position set to: {spawnedPet.transform.position}");
+            Debug.Log($"[PetPlacementController] Pet position set to: {spawnedPet.transform.position}, Plane Y: {pose.position.y}");
             
             // 카메라를 향하도록 회전
             Vector3 cameraPosition = arCamera.transform.position;
@@ -305,6 +319,13 @@ public class PetPlacementController : MonoBehaviour
     {
         Debug.Log($"[PetPlacementController] Planes changed - Added: {args.added.Count}, Updated: {args.updated.Count}, Removed: {args.removed.Count}");
         
+        // 펫이 이미 배치되었으면 평면 업데이트 무시
+        if (petPlaced)
+        {
+            Debug.Log("[PetPlacementController] Pet already placed, ignoring plane updates");
+            return;
+        }
+        
         // ARPlaneManager의 planePrefab 확인
         if (planeManager != null && planeManager.planePrefab != null)
         {
@@ -319,29 +340,27 @@ public class PetPlacementController : MonoBehaviour
         {
             Debug.Log($"[PetPlacementController] New plane added: {plane.gameObject.name}, Active: {plane.gameObject.activeSelf}");
             
-            // 이미 평면이 하나 이상 있으면 새로운 평면은 숨김
-            bool shouldHide = false;
-            foreach (var existingPlane in planeManager.trackables)
+            // 선택된 평면이 없으면 새 평면을 활성화
+            if (selectedPlane == null)
             {
-                if (existingPlane != plane && existingPlane.gameObject.activeSelf)
+                // 기존 평면들을 모두 숨김
+                foreach (var existingPlane in planeManager.trackables)
                 {
-                    shouldHide = true;
-                    break;
+                    if (existingPlane != plane)
+                    {
+                        existingPlane.gameObject.SetActive(false);
+                    }
                 }
-            }
-            
-            if (shouldHide)
-            {
-                plane.gameObject.SetActive(false);
-                Debug.Log($"[PetPlacementController] Hiding new plane {plane.gameObject.name} as we already have active planes");
-                continue;
-            }
-            
-            // GameObject 활성화
-            if (!plane.gameObject.activeSelf)
-            {
+                
+                // 새 평면 활성화
                 plane.gameObject.SetActive(true);
-                Debug.Log($"[PetPlacementController] Activated plane GameObject: {plane.gameObject.name}");
+                Debug.Log($"[PetPlacementController] Activated new plane: {plane.gameObject.name}");
+            }
+            else
+            {
+                // 선택된 평면이 있으면 새 평면은 숨김
+                plane.gameObject.SetActive(false);
+                Debug.Log($"[PetPlacementController] Hiding new plane {plane.gameObject.name} as we have a selected plane");
             }
             
             // ARPlaneMeshVisualizer 컴포넌트 추가 (메시 생성을 위해)
@@ -365,8 +384,34 @@ public class PetPlacementController : MonoBehaviour
         
         foreach (ARPlane plane in args.updated)
         {
-            // 업데이트 로그를 줄임 (너무 많은 로그 방지)
-            // Debug.Log($"[PetPlacementController] Plane updated: {plane.gameObject.name}, Size: {plane.size}");
+            // 선택되지 않은 평면이 업데이트되고 더 크면 전환
+            if (selectedPlane == null && plane.gameObject.activeSelf)
+            {
+                // 현재 활성화된 평면 찾기
+                ARPlane currentActivePlane = null;
+                foreach (var p in planeManager.trackables)
+                {
+                    if (p.gameObject.activeSelf && p != plane)
+                    {
+                        currentActivePlane = p;
+                        break;
+                    }
+                }
+                
+                // 새 평면이 더 크면 전환
+                if (currentActivePlane != null)
+                {
+                    float currentArea = currentActivePlane.size.x * currentActivePlane.size.y;
+                    float newArea = plane.size.x * plane.size.y;
+                    
+                    if (newArea > currentArea * 1.5f) // 1.5배 이상 크면 전환
+                    {
+                        currentActivePlane.gameObject.SetActive(false);
+                        plane.gameObject.SetActive(true);
+                        Debug.Log($"[PetPlacementController] Switched to larger plane: {plane.gameObject.name} (Area: {newArea} vs {currentArea})");
+                    }
+                }
+            }
         }
         
         foreach (var removedPair in args.removed)

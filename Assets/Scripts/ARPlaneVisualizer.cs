@@ -130,6 +130,14 @@ public class ARPlaneVisualizer : MonoBehaviour
     {
         Debug.Log($"[ARPlaneVisualizer] OnEnable called for {gameObject.name}, TrackingState: {arPlane?.trackingState}");
         
+        // LineRenderer 비활성화 (검정색 아웃라인 제거)
+        LineRenderer lineRenderer = GetComponent<LineRenderer>();
+        if (lineRenderer != null)
+        {
+            lineRenderer.enabled = false;
+            Debug.Log($"[ARPlaneVisualizer] LineRenderer disabled in OnEnable for {gameObject.name}");
+        }
+        
         if (meshRenderer != null)
         {
             meshRenderer.enabled = true;

@@ -98,20 +98,32 @@ public class PetPlacementController : MonoBehaviour
         // 프레임 대기 (평면이 생성될 시간을 줌)
         yield return new WaitForSeconds(0.5f);
         
-        // 첫 번째 평면을 제외한 모든 평면 숨기기
-        bool firstPlaneFound = false;
+        // 가장 큰 평면만 활성화
+        ARPlane largestPlane = null;
+        float largestArea = 0f;
+        
         foreach (var plane in planeManager.trackables)
         {
-            if (!firstPlaneFound)
+            float area = plane.size.x * plane.size.y;
+            if (area > largestArea)
+            {
+                largestArea = area;
+                largestPlane = plane;
+            }
+        }
+        
+        // 모든 평면을 숨기고 가장 큰 평면만 표시
+        foreach (var plane in planeManager.trackables)
+        {
+            if (plane == largestPlane)
             {
                 plane.gameObject.SetActive(true);
-                firstPlaneFound = true;
-                Debug.Log($"[PetPlacementController] Keeping first plane active: {plane.gameObject.name}");
+                Debug.Log($"[PetPlacementController] Keeping largest plane active: {plane.gameObject.name}, Area: {largestArea}");
             }
             else
             {
                 plane.gameObject.SetActive(false);
-                Debug.Log($"[PetPlacementController] Hiding extra plane: {plane.gameObject.name}");
+                Debug.Log($"[PetPlacementController] Hiding smaller plane: {plane.gameObject.name}");
             }
         }
     }
@@ -191,13 +203,21 @@ public class PetPlacementController : MonoBehaviour
     {
         selectedPlane = plane;
         
-        // 모든 평면의 선택 상태 업데이트
+        // 모든 평면을 숨기고 선택된 평면만 표시
         foreach (var trackablePlane in planeManager.trackables)
         {
-            var visualizer = trackablePlane.GetComponent<ARPlaneVisualizer>();
-            if (visualizer != null)
+            if (trackablePlane == selectedPlane)
             {
-                visualizer.SetVisualizationActive(trackablePlane == selectedPlane);
+                trackablePlane.gameObject.SetActive(true);
+                var visualizer = trackablePlane.GetComponent<ARPlaneVisualizer>();
+                if (visualizer != null)
+                {
+                    visualizer.SetSelected(true);
+                }
+            }
+            else
+            {
+                trackablePlane.gameObject.SetActive(false);
             }
         }
         
@@ -229,10 +249,10 @@ public class PetPlacementController : MonoBehaviour
         
         if (spawnedPet != null)
         {
-            // 펫의 위치를 평면 위에 정확히 배치 (Y 오프셋 제거)
+            // 펫의 위치를 평면 위에 정확히 배치 (Y 오프셋 최소화)
             Vector3 petPosition = pose.position;
-            // 펫의 바닥이 평면에 닿도록 조정 (필요한 경우 약간의 오프셋 추가)
-            petPosition.y = pose.position.y + 0.01f; // 1cm 정도만 위로
+            // 펫의 바닥이 평면에 거의 닿도록 조정
+            petPosition.y = pose.position.y; // 오프셋 제거, 평면에 바로 배치
             
             spawnedPet.transform.position = petPosition;
             Debug.Log($"[PetPlacementController] Pet position set to: {spawnedPet.transform.position}");
